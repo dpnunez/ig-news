@@ -12,7 +12,7 @@ type User = {
 	},
 	data: { 
 		email: string,
-		stripe_costumer_id: string
+		stripe_custumer_id: string
 	}
 }
 
@@ -29,9 +29,10 @@ const subscription = async (req: NextApiRequest, res: NextApiResponse) => {
 			)
 		)
 
-		let customerId = user.data.stripe_costumer_id
+		let custumerId = user.data.stripe_custumer_id
+			
 
-		if (!customerId) {
+		if (!custumerId) {
 			const stripeConstumer = await stripe.customers.create({
 				email: session.user.email,
 				// metadata
@@ -42,22 +43,22 @@ const subscription = async (req: NextApiRequest, res: NextApiResponse) => {
 					q.Ref(q.Collection('users'), user.ref.id),
 					{
 						data: {
-							stripe_costumer_id: stripeConstumer.id
+							stripe_custumer_id: stripeConstumer.id
 						}
 					}
 				)
 			)
 
-			customerId = stripeConstumer.id
+			custumerId = stripeConstumer.id
 		}
 		
 
 		const stripeCheckoutSession = await stripe.checkout.sessions.create({
-			customer: customerId,
+			customer: custumerId,
 			payment_method_types: ['card'],
 			billing_address_collection: 'required',
 			line_items: [
-				{ price: 'price_1JHbRRJgH64G4lDDKZMUOHqn', quantity: 1.}
+				{ price: 'price_1JHbRRJgH64G4lDDKZMUOHqn', quantity: 1 }
 			],
 			mode: 'subscription',
 			allow_promotion_codes: true,
@@ -74,3 +75,4 @@ const subscription = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 export default subscription
+
